@@ -1,42 +1,39 @@
-#include <avr/interrupt.h>
+//#include <avr/interrupt.h>
+#include <stdarg.h>
 
-int LED = 11;
-int inputPin = 2;//pin 2
+int SOL = 11;
+int LED = 13;
+int inputPin = 2;//pin 2 (interrupts)
+int solar = 0;
+int sensorValue=0;
 //digitalPinToInterrupt wasn't working 
 //https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
-volatile boolean LED_ON = false;
 
 void setup(){
-  //pass
   pinMode(LED, OUTPUT);
+    pinMode(SOL, OUTPUT);
+  //int pin = digitalPinToInterrupt(inputPin);
+  int pin = 0;
   pinMode(inputPin, INPUT_PULLUP);//the interrupt, low when pressed)
-  attachInterrupt(0, buttonPressed, FALLING);
+  attachInterrupt(pin, buttonPressed, CHANGE);
+  Serial.begin(9600);
 }
 
 void loop(){
-  //pass
-  //digitalWrite(LED, HIGH);
-  delay(50000);
- // digitalWrite(LED, LOW);
-  //delay(500);
+  delay(5000);
+  sensorValue = analogRead(solar);
+  Serial.print("hello"+ String(sensorValue) + "\n");
 }
 
-void buttonPressed(){
-  detachInterrupt(0);
-  digitalWrite(LED, HIGH);
-  delay(1000);
-  digitalWrite(LED, LOW);
-  delay(1000);
-  attachInterrupt(0, buttonPressed, FALLING);
 
-  
-  /*
-  if(LED_ON == true){
-    digitalWrite(LED, LOW);
-    LED_ON = false;
-  }else{
-    digitalWrite(LED, HIGH);
-    LED_ON = true;
-  }
-  */
+void buttonPressed(){
+  //detachInterrupt(inputPin);
+  noInterrupts();
+  digitalWrite(LED, HIGH);
+  digitalWrite(SOL,LOW);
+  delay(100000);
+  digitalWrite(SOL,HIGH);
+  digitalWrite(LED, LOW);
+  interrupts();
+  //attachInterrupt(0, buttonPressed, FALLING);
 }
